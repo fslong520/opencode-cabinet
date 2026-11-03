@@ -1,9 +1,14 @@
 # opencode-cabinet
 
 Five Ming-cabinet-style role agents for [opencode](https://opencode.ai), modeled on the
-cabinet workflow used in Qoder and registered the same way oh-my-openagent registers its
-agents: a plugin entry whose `config` hook injects agent definitions into the merged
-opencode config.
+cabinet workflow used in Qoder. Works on both runtimes from one package:
+
+- **OpenCode 2** — the default export's `setup(ctx)` registers an `agent.transform`
+  that upserts the five roles and sets the default agent.
+- **opencode 1.x** — the `server(input, options)` export returns a `config` hook that
+  injects agent definitions into the merged config (the oh-my-openagent pattern).
+
+User-defined entries always win over the shipped defaults, key by key, on both runtimes.
 
 ## The roster
 
@@ -41,7 +46,14 @@ That's it. opencode installs npm plugins automatically with Bun at startup
 Restart opencode, then confirm:
 
 ```bash
-opencode agent list          # should show the five cabinet agents
+opencode plugin list           # shows opencode-cabinet
+```
+
+One-command alternative (writes the config for you):
+
+```bash
+opencode plugin add opencode-cabinet    # OpenCode 2
+opencode plugin opencode-cabinet -g     # opencode 1.x
 ```
 
 ### With the installer script
@@ -110,14 +122,17 @@ Permissions are part of the design, not decoration:
 - No subagent can fan out to further subagents (`task: deny`); only the captain dispatches.
 
 A user-defined entry for the same agent name in `opencode.json` overrides these defaults
-key by key, so you can widen or tighten any rule without forking the plugin.
+key by key, so you can widen or tighten any rule without forking the plugin. The key is
+`agents` on OpenCode 2 (`"agents": { "grand-secretary": { ... } }`) and `agent` on
+opencode 1.x; OpenCode 2 also renamed two permission actions — `bash` becomes `shell`
+and `task` becomes `subagent` — which this plugin maps automatically.
 
 ## Layout
 
 ```
 opencode-cabinet/
 ├── package.json        # entrypoint (main / exports["./server"]), postinstall wiring
-├── index.js            # plugin: default export { id, server }, config hook injects agents
+├── index.js            # plugin: default export { id, setup, server }; v2 agent.transform + v1 config hook
 ├── scripts/
 │   └── install.js      # install-time config wiring (idempotent, backup, JSONC-safe)
 ├── agents/             # one prompt file per role, English
@@ -133,12 +148,16 @@ opencode-cabinet/
 ## Verify
 
 ```bash
-cd test/sandbox
-opencode agent list          # should show the five cabinet agents
-opencode agent list --pure   # baseline without external plugins
+# OpenCode 2
+opencode debug agents         # lists all agents (JSON)
+opencode api GET /api/agent   # first id = the resolved default agent
+
+# opencode 1.x
+opencode agent list           # should show the five cabinet agents
+opencode agent list --pure    # baseline without external plugins
 
 # full resolved config of one agent (prompt, description, color, permissions)
-opencode debug agent grand-secretary
+opencode debug agent grand-secretary     # 1.x
 ```
 
 To verify the online npm path exactly as another user would experience it, isolate the
@@ -146,7 +165,7 @@ global config so only the sandbox's `"plugin": ["opencode-cabinet"]` applies:
 
 ```bash
 cd test/sandbox-npm
-XDG_CONFIG_HOME=$(mktemp -d) opencode agent list   # five agents = auto-install worked
+XDG_CONFIG_HOME=$(mktemp -d) opencode debug agents   # five agents = auto-install worked
 ```
 
 `test/sandbox-override` additionally exercises the `models` option and a user-defined

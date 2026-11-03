@@ -1,6 +1,6 @@
 {
   "name": "opencode-cabinet",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Five Ming-cabinet-style role agents for opencode: a Grand Secretary who frames and dispatches the task, plus a Researcher, an Executor, a Reviewer and an Inspector with a hard acceptance loop.",
   "type": "module",
   "main": "./index.js",
