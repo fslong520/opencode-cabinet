@@ -126,7 +126,8 @@ opencode-cabinet/
 │   ├── works-executor.md
 │   ├── court-reviewer.md
 │   └── censor-inspector.md
-└── test/sandbox/       # minimal opencode.json loading the plugin by path
+├── test/sandbox/       # minimal opencode.json loading the plugin by path
+└── test/sandbox-npm/   # minimal opencode.json loading the plugin by npm name
 ```
 
 ## Verify
@@ -138,6 +139,14 @@ opencode agent list --pure   # baseline without external plugins
 
 # full resolved config of one agent (prompt, description, color, permissions)
 opencode debug agent grand-secretary
+```
+
+To verify the online npm path exactly as another user would experience it, isolate the
+global config so only the sandbox's `"plugin": ["opencode-cabinet"]` applies:
+
+```bash
+cd test/sandbox-npm
+XDG_CONFIG_HOME=$(mktemp -d) opencode agent list   # five agents = auto-install worked
 ```
 
 `test/sandbox-override` additionally exercises the `models` option and a user-defined
