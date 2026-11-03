@@ -1,0 +1,36 @@
+{
+  "name": "opencode-cabinet",
+  "version": "0.1.0",
+  "description": "Five Ming-cabinet-style role agents for opencode: a Grand Secretary who frames and dispatches the task, plus a Researcher, an Executor, a Reviewer and an Inspector with a hard acceptance loop.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./server": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "agents",
+    "scripts"
+  ],
+  "scripts": {
+    "postinstall": "node scripts/install.js",
+    "install:config": "node scripts/install.js"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "agents",
+    "orchestration",
+    "cabinet"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fslong520/opencode-cabinet.git"
+  },
+  "homepage": "https://github.com/fslong520/opencode-cabinet#readme",
+  "bugs": {
+    "url": "https://github.com/fslong520/opencode-cabinet/issues"
+  }
+}
